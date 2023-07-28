@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SampleMVCApp.Models;
+using SampleMVC.Models;
 using System.Diagnostics;
+
 
 namespace SampleMVCApp.Controllers
 {

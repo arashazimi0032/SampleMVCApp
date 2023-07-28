@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SampleMVCApp.Data;
-using SampleMVCApp.Models;
+using SampleMVC.Models;
+using SampleMVCApp.DataAccess.Data;
 
 namespace SampleMVCApp.Controllers
 {

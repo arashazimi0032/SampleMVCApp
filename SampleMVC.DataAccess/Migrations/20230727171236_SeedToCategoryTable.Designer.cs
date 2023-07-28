@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SampleMVCApp.Data;
+using SampleMVCApp.DataAccess.Data;
 
 #nullable disable
 
-namespace SampleMVCApp.Migrations
+namespace SampleMVCApp.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20230727171236_SeedToCategoryTable")]
