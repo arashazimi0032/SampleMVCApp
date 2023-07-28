@@ -3,8 +3,9 @@ using SampleMVC.Models;
 using System.Diagnostics;
 
 
-namespace SampleMVCApp.Controllers
+namespace SampleMVCApp.Areas.Customer.Controllers
 {
+    [Area("Customer")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
