@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
+using SampleMVC.Models.ViewModels;
 using SampleMVCApp.DataAccess.Data;
 using System.Collections.Generic;
 
@@ -11,9 +12,12 @@ namespace SampleMVCApp.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ProductController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -21,7 +25,7 @@ namespace SampleMVCApp.Areas.Admin.Controllers
             return View(objProductList);
         }
 
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
             IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
                 .Select(u => new SelectListItem
@@ -30,52 +34,79 @@ namespace SampleMVCApp.Areas.Admin.Controllers
                     Value = u.Id.ToString(),
                 });
             //ViewBag.CategoryList = CategoryList;  // Way 1 ViewBag Can Use Directly
-            ViewData["CategoryList"] = CategoryList;  // Way 2 ViewData not can use directly but need to cast as IEnumerable<SelectListItem>
+            //ViewData["CategoryList"] = CategoryList;  // Way 2 ViewData not can use directly but need to cast as IEnumerable<SelectListItem>
             //--!! Important!!--// ViewBag internally inserts data into ViewData dictionary. So the key of ViewData and property of ViewBag must Not match.
-            return View();
+            ProductVM productVM = new ProductVM()
+            {
+                Product = new Product(), 
+                CategoryList = CategoryList
+            };
+
+            if (id == null || id == 0)
+            {
+                // create
+                return View(productVM);
+            }
+            else
+            {
+                //update 
+                productVM.Product = _unitOfWork.Product.Get(u => u.Id == id);
+                return View(productVM);
+            }
         }
 
         [HttpPost]
-        public IActionResult Create(Product obj)
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Product.Add(obj);
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    {
+                        // delete old image
+                        string oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    productVM.Product.ImageUrl = @"\Images\product\" + fileName;
+                }
+
+                if (productVM.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(productVM.Product);
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(productVM.Product);
+                }
+
                 _unitOfWork.Save();
                 TempData["success"] = "Product created successfully";
                 return RedirectToAction("Index", "Product");
             }
-            return View(obj);
-        }
-
-        public IActionResult Edit(int? id)
-        {
-            if (id == null || id == 0)
+            else
             {
-                return NotFound();
+                IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+                .Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString(),
+                });
+                productVM.CategoryList = CategoryList;
+                return View(productVM);
             }
-            Product? productFromDb = _unitOfWork.Product.Get(u => u.Id == id);
-            //Product? productFromDb = _db.Categories.Find(id); // just for primary key
-            //Product? productFromDb1 = _db.Categories.FirstOrDefault(u => u.Id = id); // works for every things like (u => u.Name.Contain("Blah"))
-            //Product? productFromDb2 = _db.Categories.Where(u => u.Id == id).FirstOrDefault();
-            if (productFromDb == null)
-            {
-                return NotFound();
-            }
-            return View(productFromDb);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product obj)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.Product.Update(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Product updated successfully";
-                return RedirectToAction("Index", "Product");
-            }
-            return View(obj);
         }
 
         public IActionResult Delete(int? id)
