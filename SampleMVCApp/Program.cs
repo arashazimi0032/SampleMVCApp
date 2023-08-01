@@ -3,6 +3,8 @@ using SampleMVC.DataAccess.Repository;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVCApp.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using SampleMVC.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +16,13 @@ o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // if use first line ==> email confirmation needed.
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 // if use second line ==> email confirmation dosn't needed.
-builder.Services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
 
