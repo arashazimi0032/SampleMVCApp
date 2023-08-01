@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
 using SampleMVC.Models.ViewModels;
+using SampleMVC.Utility;
 using SampleMVCApp.DataAccess.Data;
 using System.Collections.Generic;
 
 namespace SampleMVCApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

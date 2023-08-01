@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
+using SampleMVC.Utility;
 using SampleMVCApp.DataAccess.Data;
 
 namespace SampleMVCApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
