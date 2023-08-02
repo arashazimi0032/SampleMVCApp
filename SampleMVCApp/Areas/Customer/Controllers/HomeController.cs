@@ -27,8 +27,13 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 
         public IActionResult Details(int productId)
         {
-            Product product = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category");
-            return View(product);
+            ShoppingCart cart = new ShoppingCart
+            {
+                Product = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category"),
+                Count = 1,
+                ProductId = productId
+            };
+            return View(cart);
         }
 
         public IActionResult Privacy()
