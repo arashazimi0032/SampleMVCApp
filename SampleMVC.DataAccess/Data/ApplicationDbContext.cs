@@ -15,6 +15,7 @@ namespace SampleMVCApp.DataAccess.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             
@@ -24,6 +25,39 @@ namespace SampleMVCApp.DataAccess.Data
                 new Category { Id = 1, Name = "Action", DisplayOrder = 1 },
                 new Category { Id = 2, Name = "SciFi", DisplayOrder = 2 },
                 new Category { Id = 3, Name = "History", DisplayOrder = 3 }
+                );
+
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "Tech solution",
+                    StreetAddress = "123 Tech St",
+                    City = "Tech City",
+                    PostalCode = "12124",
+                    State = "IL",
+                    PhoneNumber = "09543476568"
+                },
+                new Company
+                {
+                    Id = 2,
+                    Name = "Vivid Books",
+                    StreetAddress = "999 Vid St",
+                    City = "Vid City",
+                    PostalCode = "56498",
+                    State = "IL",
+                    PhoneNumber = "777999000"
+                },
+                new Company
+                {
+                    Id = 3,
+                    Name = "Readers Club",
+                    StreetAddress = "999 Main St",
+                    City = "Lala land",
+                    PostalCode = "99999",
+                    State = "NY",
+                    PhoneNumber = "998554477"
+                }
                 );
 
             modelBuilder.Entity<Product>().HasData(
