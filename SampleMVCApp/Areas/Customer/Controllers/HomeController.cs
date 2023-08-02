@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
-
+using System.Security.Claims;
 
 namespace SampleMVCApp.Areas.Customer.Controllers
 {
@@ -34,6 +35,29 @@ namespace SampleMVCApp.Areas.Customer.Controllers
                 ProductId = productId
             };
             return View(cart);
+        }
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart shoppingCart)
+        {
+            ClaimsIdentity claimsIdentity = (ClaimsIdentity)User.Identity;
+            string userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            shoppingCart.ApplicationUserId = userId;
+
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ApplicationUserId == userId && 
+            u.ProductId == shoppingCart.ProductId);
+            if (cartFromDb != null)
+            {
+                cartFromDb.Count += shoppingCart.Count;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+            }
+            else
+            {
+                _unitOfWork.ShoppingCart.Add(shoppingCart);
+            }
+
+            _unitOfWork.Save();
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()
