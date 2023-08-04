@@ -166,7 +166,7 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 			OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties:"ApplicationUser");
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
-				// this is an order bu customer
+				// this is an order by customer
 				var service = new SessionService();
 				Session session = service.Get(orderHeader.SessionId);
 				if(session.PaymentStatus.ToLower() == "paid")
