@@ -4,6 +4,7 @@ using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
 using SampleMVC.Models.ViewModels;
 using SampleMVC.Utility;
+using Stripe;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -94,8 +95,36 @@ namespace SampleMVCApp.Areas.Admin.Controllers
             return RedirectToAction("Details", new { orderId = OrderVM.OrderHeader.Id });
         }
 
-        #region API CALLS
-        [HttpGet]
+		[HttpPost]
+		[Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+		public IActionResult CancelOrder()
+		{
+            OrderHeader orderHeaderFromDb = _unitOfWork.OrderHeader.Get(u => u.Id == OrderVM.OrderHeader.Id);
+			if (orderHeaderFromDb.PaymentStatus == SD.PaymentStatusApproved)
+			{
+				var options = new RefundCreateOptions
+				{
+					Reason = RefundReasons.RequestedByCustomer,
+					PaymentIntent = orderHeaderFromDb.PaymentIntentId
+				};
+				var service = new RefundService();
+				Refund refund = service.Create(options);
+
+				_unitOfWork.OrderHeader.UpdateStatus(orderHeaderFromDb.Id, SD.StatusCancelled, SD.StatusRefunded);
+			}
+			else
+			{
+				_unitOfWork.OrderHeader.UpdateStatus(orderHeaderFromDb.Id, SD.StatusCancelled, SD.StatusCancelled);
+			}
+            _unitOfWork.Save();
+
+            TempData["success"] = "Order Cancelled Successfully.";
+
+            return RedirectToAction("Details", new { orderId = OrderVM.OrderHeader.Id });
+        }
+
+            #region API CALLS
+            [HttpGet]
 		public IActionResult GetAll(string status)
 		{
 			IEnumerable<OrderHeader> objOrderHeader;
