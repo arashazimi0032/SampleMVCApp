@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
+using SampleMVC.Models.ViewModels;
 using SampleMVC.Utility;
 using System.Diagnostics;
 
@@ -18,6 +19,15 @@ namespace SampleMVCApp.Areas.Admin.Controllers
         public IActionResult Index()
 		{
 			return View();
+		}
+        public IActionResult Details(int orderId)
+		{
+			OrderVM orderVM = new OrderVM
+			{
+				OrderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == orderId, includeProperties:"ApplicationUser"),
+				OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeaderId == orderId, includeProperties:"Product")
+			};
+			return View(orderVM);
 		}
 
 		#region API CALLS
