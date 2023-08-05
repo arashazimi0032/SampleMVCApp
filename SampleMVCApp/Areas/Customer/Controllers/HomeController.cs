@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SampleMVC.DataAccess.Repository.IRepository;
 using SampleMVC.Models;
+using SampleMVC.Utility;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -50,14 +52,17 @@ namespace SampleMVCApp.Areas.Customer.Controllers
             {
                 cartFromDb.Count += shoppingCart.Count;
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
+                _unitOfWork.Save();
             }
             else
             {
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
+                _unitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId).Count());
             }
             TempData["success"] = "Cart updated successfully";
 
-            _unitOfWork.Save();
             return RedirectToAction("Index");
         }
 
