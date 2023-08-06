@@ -32,8 +32,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddAuthentication().AddGoogle(option =>
 {
-    option.ClientId = builder.Configuration["GoogleAuthentication:ClientId"];
-    option.ClientSecret = builder.Configuration["GoogleAuthentication:ClientSecret"];
+    option.ClientId = builder.Configuration.GetSection("GoogleAuthentication").GetValue<string>("ClientId");
+    option.ClientSecret = builder.Configuration.GetSection("GoogleAuthentication").GetValue<string>("ClientSecret");
 });
 
 builder.Services.AddDistributedMemoryCache();
