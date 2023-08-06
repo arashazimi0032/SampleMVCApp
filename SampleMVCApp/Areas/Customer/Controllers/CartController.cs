@@ -174,14 +174,17 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 					_unitOfWork.OrderHeader.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
 					_unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
 					_unitOfWork.Save();
-				}
+                }
             }
 
 			List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
 				.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
 
-			_unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+            _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
 			_unitOfWork.Save();
+
+            HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).Count());
 
             return View(id);
 		}

@@ -30,6 +30,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
 
+builder.Services.AddAuthentication().AddGoogle(option =>
+{
+    option.ClientId = builder.Configuration["GoogleAuthentication:ClientId"];
+    option.ClientSecret = builder.Configuration["GoogleAuthentication:ClientSecret"];
+});
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(option =>
 {
