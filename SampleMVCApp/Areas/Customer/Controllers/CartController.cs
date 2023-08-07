@@ -175,6 +175,7 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 					_unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
 					_unitOfWork.Save();
                 }
+				HttpContext.Session.Clear();
             }
 
 			List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
@@ -182,9 +183,6 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
 			_unitOfWork.Save();
-
-            HttpContext.Session.SetInt32(SD.SessionCart,
-                    _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).Count());
 
             return View(id);
 		}
