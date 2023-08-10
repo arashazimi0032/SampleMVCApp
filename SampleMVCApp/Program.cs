@@ -16,7 +16,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(o =>
 o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 
 // if use first line ==> email confirmation needed.
@@ -52,8 +51,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -86,7 +83,6 @@ app.MapControllerRoute(
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
 
 void SeedDatabase()
 {
