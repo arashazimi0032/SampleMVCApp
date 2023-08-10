@@ -121,7 +121,7 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 			{
 				// it is a regular customer account and we need to capture payment.
 				// stripe logic
-				string domain = "https://localhost:7004/";
+				string domain = Request.Scheme + "://" + Request.Host.Value + "/";
 				var options = new SessionCreateOptions
 				{
 					SuccessUrl = domain + $"customer/cart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.Id}",
@@ -175,10 +175,10 @@ namespace SampleMVCApp.Areas.Customer.Controllers
 					_unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
 					_unitOfWork.Save();
                 }
-				HttpContext.Session.Clear();
             }
+            HttpContext.Session.Clear();
 
-			List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
 				.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
 
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
