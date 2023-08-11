@@ -26,6 +26,30 @@ namespace SampleMVCApp.Areas.Admin.Controllers
             return View();
         }
 
+        public IActionResult RoleManagment(string userId)
+        {
+            string RoleId = _db.UserRoles.FirstOrDefault(x => x.UserId == userId).RoleId;
+
+            RolemanagmentVM RoleVM = new RolemanagmentVM()
+            {
+                ApplicationUser = _db.ApplicationUsers.Include(u => u.Company).FirstOrDefault(u => u.Id == userId),
+                RoleList = _db.Roles.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Name
+                }), 
+                CompanyList = _db.Companies.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                })
+            };
+
+            RoleVM.ApplicationUser.Role = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
+
+            return View(RoleVM);
+        }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
