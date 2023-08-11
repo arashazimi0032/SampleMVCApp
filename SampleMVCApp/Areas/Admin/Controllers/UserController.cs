@@ -65,10 +65,10 @@ namespace SampleMVCApp.Areas.Admin.Controllers
             }
             else
             {
-                objFromDb.LockoutEnd = DateTime.Now.AddDays(1000);
+                objFromDb.LockoutEnd = DateTime.Now.AddYears(1000);
             }
             _db.SaveChanges();
-            return Json(new { success = true, message = "Delete Successfully." });
+            return Json(new { success = true, message = "Operation Successfully." });
         }
         #endregion
     }
