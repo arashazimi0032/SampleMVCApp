@@ -17,9 +17,11 @@ namespace SampleMVCApp.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public UserController(ApplicationDbContext db)
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -48,6 +50,33 @@ namespace SampleMVCApp.Areas.Admin.Controllers
             RoleVM.ApplicationUser.Role = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
 
             return View(RoleVM);
+        }
+
+        [HttpPost]
+        public IActionResult RoleManagment(RolemanagmentVM rolemanagmentVM)
+        {
+            string RoleId = _db.UserRoles.FirstOrDefault(x => x.UserId == rolemanagmentVM.ApplicationUser.Id).RoleId;
+            string oldRole = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
+
+            if (!(rolemanagmentVM.ApplicationUser.Role == oldRole))
+            {
+                // a role was updated
+                ApplicationUser applicationUser = _db.ApplicationUsers.FirstOrDefault(u => u.Id == rolemanagmentVM.ApplicationUser.Id);
+                if (rolemanagmentVM.ApplicationUser.Role == SD.Role_Company)
+                {
+                    applicationUser.CompanyId = rolemanagmentVM.ApplicationUser.CompanyId;
+                }
+                if (oldRole == SD.Role_Company)
+                {
+                    applicationUser.CompanyId = null;
+                }
+                _db.SaveChanges();
+                _userManager.RemoveFromRoleAsync(applicationUser, oldRole).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(applicationUser, rolemanagmentVM.ApplicationUser.Role).GetAwaiter().GetResult();
+                TempData["success"] = $"Role Changed to {rolemanagmentVM.ApplicationUser.Role} successfully";
+            }
+
+            return RedirectToAction("Index");
         }
 
         #region API CALLS
