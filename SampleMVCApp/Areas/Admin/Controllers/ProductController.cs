@@ -156,6 +156,29 @@ namespace SampleMVCApp.Areas.Admin.Controllers
         //    return RedirectToAction("Index", "Product");
         //}
 
+        public IActionResult DeleteImage(int imageId)
+        {
+            var imageToBeDeleted = _unitOfWork.ProductImage.Get(u => u.Id == imageId);
+            int productId = imageToBeDeleted.ProductId;
+            if(imageToBeDeleted != null)
+            {
+                if (!string.IsNullOrEmpty(imageToBeDeleted.ImageUrl))
+                {
+                    string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                        imageToBeDeleted.ImageUrl.TrimStart('\\'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+                _unitOfWork.ProductImage.Remove(imageToBeDeleted);
+                _unitOfWork.Save();
+
+                TempData["success"] = "Deleted Successfully";
+            }
+            return RedirectToAction("Upsert", new {id = productId});
+        }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
