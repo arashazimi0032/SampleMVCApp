@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +32,14 @@ namespace SampleMVCApp.Areas.Admin.Controllers
         {
             List<ApplicationUser> objUserList = _db.ApplicationUsers.Include(u => u.Company).ToList();
 
+            List<IdentityUserRole<string>> userRoles = _db.UserRoles.ToList();
+            List<IdentityRole> roles = _db.Roles.ToList();
+
             foreach (ApplicationUser user in objUserList)
             {
+                string roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id).RoleId;
+                user.Role = roles.FirstOrDefault(u => u.Id == roleId).Name;
+
                 if (user.Company == null)
                 {
                     user.Company = new Company() { Name = ""};
