@@ -37,6 +37,12 @@ builder.Services.AddAuthentication().AddGoogle(option =>
     option.ClientSecret = builder.Configuration.GetSection("GoogleAuthentication").GetValue<string>("ClientSecret");
 });
 
+builder.Services.AddAuthentication().AddMicrosoftAccount(option =>
+{
+    option.ClientId = builder.Configuration.GetSection("MicrosoftAuthentication").GetValue<string>("ClientId");
+    option.ClientSecret = builder.Configuration.GetSection("MicrosoftAuthentication").GetValue<string>("ClientSecret");
+});
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(option =>
 {
